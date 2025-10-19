@@ -7,21 +7,23 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMovies } from '../context/MovieContext';
 import { useAuth } from '../context/AuthContext';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: any) {
   const { stats, loading, refreshMovies } = useMovies();
   const { userData } = useAuth();
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={loading} onRefresh={refreshMovies} />
-      }
-    >
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refreshMovies} />
+        }
+      >
+        <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {userData?.displayName || 'User'}!</Text>
         <Text style={styles.subGreeting}>Track your movie journey</Text>
       </View>
@@ -72,15 +74,26 @@ export default function HomeScreen() {
       {/* Quick Actions */}
       <View style={styles.widgetContainer}>
         <Text style={styles.widgetTitle}>Quick Actions</Text>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            console.log('[HOME] Add Movie button pressed');
+            navigation.navigate('AddMovie');
+          }}
+        >
           <Text style={styles.actionButtonText}>Add New Movie</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#007AFF', // Match header color
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -88,7 +101,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#007AFF',
     padding: 24,
-    paddingTop: 60,
+    paddingTop: 16,
     paddingBottom: 32,
   },
   greeting: {

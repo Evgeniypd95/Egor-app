@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMovies } from '../context/MovieContext';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 
@@ -68,8 +69,9 @@ export default function StatisticsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
         <Text style={styles.title}>Statistics</Text>
         <Text style={styles.subtitle}>Your movie watching journey</Text>
       </View>
@@ -162,7 +164,8 @@ export default function StatisticsScreen() {
           ))}
         </View>
       )}
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -183,6 +186,10 @@ const getTopDirectors = (movies: any[]) => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -190,7 +197,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#007AFF',
     padding: 24,
-    paddingTop: 60,
+    paddingTop: 16,
     paddingBottom: 32,
   },
   title: {

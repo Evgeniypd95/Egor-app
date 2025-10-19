@@ -9,6 +9,7 @@ import {
   RefreshControl,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMovies } from '../context/MovieContext';
 import { Movie } from '../types';
 
@@ -65,8 +66,9 @@ export default function MoviesListScreen({ navigation }: any) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        <View style={styles.header}>
         <TextInput
           style={styles.searchInput}
           placeholder="Search movies..."
@@ -122,11 +124,16 @@ export default function MoviesListScreen({ navigation }: any) {
           refreshControl={<RefreshControl refreshing={loading} onRefresh={refreshMovies} />}
         />
       )}
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#fff',
     padding: 16,
-    paddingTop: 60,
+    paddingTop: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

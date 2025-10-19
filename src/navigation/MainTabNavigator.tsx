@@ -18,9 +18,9 @@ export default function MainTabNavigator() {
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
         tabBarStyle: {
-          paddingBottom: 8,
+          paddingBottom: 20, // Extra padding for iOS home indicator
           paddingTop: 8,
-          height: 60,
+          height: 85, // Increased height for safe area
         },
         tabBarLabelStyle: {
           fontSize: 12,

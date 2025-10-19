@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { logOut } from '../services/authService';
 
@@ -24,7 +25,8 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
@@ -66,11 +68,16 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -79,7 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 40,
     alignItems: 'center',
-    paddingTop: 80,
+    paddingTop: 20,
   },
   avatar: {
     width: 80,
