@@ -44,7 +44,12 @@ export default function ProfileScreen({ navigation }: any) {
           style={styles.menuItem}
           onPress={() => {
             console.log('[PROFILE] Edit Profile pressed');
-            navigation.navigate('EditProfile');
+            try {
+              navigation.navigate('EditProfile');
+            } catch (error) {
+              console.error('[PROFILE] Navigation error:', error);
+              Alert.alert('Error', 'Could not navigate to Edit Profile');
+            }
           }}
         >
           <Text style={styles.menuItemText}>Edit Profile</Text>
@@ -55,7 +60,12 @@ export default function ProfileScreen({ navigation }: any) {
           style={styles.menuItem}
           onPress={() => {
             console.log('[PROFILE] Public Profile pressed');
-            navigation.navigate('PublicProfile');
+            try {
+              navigation.navigate('PublicProfile');
+            } catch (error) {
+              console.error('[PROFILE] Navigation error:', error);
+              Alert.alert('Error', 'Could not navigate to Public Profile');
+            }
           }}
         >
           <Text style={styles.menuItemText}>Public Profile</Text>
@@ -66,7 +76,12 @@ export default function ProfileScreen({ navigation }: any) {
           style={styles.menuItem}
           onPress={() => {
             console.log('[PROFILE] Privacy Settings pressed');
-            navigation.navigate('PrivacySettings');
+            try {
+              navigation.navigate('PrivacySettings');
+            } catch (error) {
+              console.error('[PROFILE] Navigation error:', error);
+              Alert.alert('Error', 'Could not navigate to Privacy Settings');
+            }
           }}
         >
           <Text style={styles.menuItemText}>Privacy Settings</Text>

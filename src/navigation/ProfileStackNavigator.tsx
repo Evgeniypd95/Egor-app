@@ -4,13 +4,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import PrivacySettingsScreen from '../screens/PrivacySettingsScreen';
 import PublicProfileScreen from '../screens/PublicProfileScreen';
-
-export type ProfileStackParamList = {
-  ProfileMain: undefined;
-  EditProfile: undefined;
-  PrivacySettings: undefined;
-  PublicProfile: undefined;
-};
+import { ProfileStackParamList } from '../types';
 
 const Stack = createStackNavigator<ProfileStackParamList>();
 

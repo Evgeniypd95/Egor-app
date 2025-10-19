@@ -88,6 +88,13 @@ export type MainTabParamList = {
   Profile: undefined;
 };
 
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  EditProfile: undefined;
+  PrivacySettings: undefined;
+  PublicProfile: undefined;
+};
+
 export type MoviesStackParamList = {
   MoviesList: undefined;
   MovieDetails: { movieId: string };
