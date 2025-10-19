@@ -79,6 +79,7 @@ EXPO_PUBLIC_OMDB_API_KEY=your_8_digit_key
 ```bash
 # Install dependencies (if not already done)
 npm install
+npx expo install expo-asset expo-font
 
 # Start the development server
 npm start
