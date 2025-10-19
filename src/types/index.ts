@@ -8,6 +8,8 @@ export interface User {
   profileUrl: string;
   publicProfileEnabled: boolean;
   createdAt: Timestamp;
+  followers?: string[]; // Array of user IDs who follow this user
+  following?: string[]; // Array of user IDs this user follows
 }
 
 // Movie type matching Firestore schema
@@ -72,6 +74,23 @@ export interface MovieStats {
   ratingDistribution: { [rating: number]: number };
 }
 
+// Following types
+export interface FollowRelationship {
+  id: string;
+  followerId: string;
+  followingId: string;
+  createdAt: Timestamp;
+}
+
+export interface UserSearchResult {
+  uid: string;
+  displayName: string;
+  profileUrl: string;
+  publicProfileEnabled: boolean;
+  followersCount?: number;
+  isFollowing?: boolean;
+}
+
 // Navigation types
 export type RootStackParamList = {
   Login: undefined;
@@ -84,6 +103,7 @@ export type MainTabParamList = {
   Home: undefined;
   AddMovie: undefined;
   Movies: undefined;
+  Discover: undefined;
   Statistics: undefined;
   Profile: undefined;
 };
@@ -93,6 +113,7 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   PrivacySettings: undefined;
   PublicProfile: undefined;
+  UserProfile: { userId: string };
 };
 
 export type MoviesStackParamList = {

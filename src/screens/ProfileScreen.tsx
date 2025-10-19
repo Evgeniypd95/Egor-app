@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { logOut } from '../services/authService';
@@ -26,85 +26,85 @@ export default function ProfileScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {userData?.displayName?.charAt(0).toUpperCase() || 'U'}
-          </Text>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {userData?.displayName?.charAt(0).toUpperCase() || 'U'}
+            </Text>
+          </View>
+          <Text style={styles.name}>{userData?.displayName || 'User'}</Text>
+          <Text style={styles.email}>{user?.email}</Text>
         </View>
-        <Text style={styles.name}>{userData?.displayName || 'User'}</Text>
-        <Text style={styles.email}>{user?.email}</Text>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Profile Settings</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Profile Settings</Text>
 
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            console.log('[PROFILE] Edit Profile pressed');
-            try {
-              navigation.navigate('EditProfile');
-            } catch (error) {
-              console.error('[PROFILE] Navigation error:', error);
-              Alert.alert('Error', 'Could not navigate to Edit Profile');
-            }
-          }}
-        >
-          <Text style={styles.menuItemText}>Edit Profile</Text>
-          <Text style={styles.menuItemArrow}>›</Text>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              console.log('[PROFILE] Edit Profile pressed');
+              try {
+                navigation.navigate('EditProfile');
+              } catch (error) {
+                console.error('[PROFILE] Navigation error:', error);
+                Alert.alert('Error', 'Could not navigate to Edit Profile');
+              }
+            }}
+          >
+            <Text style={styles.menuItemText}>Edit Profile</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              console.log('[PROFILE] Public Profile pressed');
+              try {
+                navigation.navigate('PublicProfile');
+              } catch (error) {
+                console.error('[PROFILE] Navigation error:', error);
+                Alert.alert('Error', 'Could not navigate to Public Profile');
+              }
+            }}
+          >
+            <Text style={styles.menuItemText}>Public Profile</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              console.log('[PROFILE] Privacy Settings pressed');
+              try {
+                navigation.navigate('PrivacySettings');
+              } catch (error) {
+                console.error('[PROFILE] Navigation error:', error);
+                Alert.alert('Error', 'Could not navigate to Privacy Settings');
+              }
+            }}
+          >
+            <Text style={styles.menuItemText}>Privacy Settings</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>App Settings</Text>
+
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Notifications</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>About</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            console.log('[PROFILE] Public Profile pressed');
-            try {
-              navigation.navigate('PublicProfile');
-            } catch (error) {
-              console.error('[PROFILE] Navigation error:', error);
-              Alert.alert('Error', 'Could not navigate to Public Profile');
-            }
-          }}
-        >
-          <Text style={styles.menuItemText}>Public Profile</Text>
-          <Text style={styles.menuItemArrow}>›</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            console.log('[PROFILE] Privacy Settings pressed');
-            try {
-              navigation.navigate('PrivacySettings');
-            } catch (error) {
-              console.error('[PROFILE] Navigation error:', error);
-              Alert.alert('Error', 'Could not navigate to Privacy Settings');
-            }
-          }}
-        >
-          <Text style={styles.menuItemText}>Privacy Settings</Text>
-          <Text style={styles.menuItemArrow}>›</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Settings</Text>
-
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>Notifications</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>About</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -114,9 +114,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  container: {
+  scrollView: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 120, // Extra padding to ensure logout button is above tab bar (85px + 35px buffer)
   },
   header: {
     backgroundColor: '#fff',

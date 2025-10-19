@@ -1,6 +1,6 @@
 # Movie Tracker App - Setup & Run Guide
 
-A React Native app for tracking movies you've watched with ratings, statistics, and IMDB integration.
+A React Native app for tracking movies you've watched with ratings, statistics, IMDB integration, and social features to discover and follow other movie enthusiasts.
 
 ## Quick Start (5 Steps)
 
@@ -109,15 +109,25 @@ The app will show warnings about missing icons - this is OK for development! The
 
 ## Features
 
+### Core Movie Tracking
 - **Authentication**: Email/password login & signup
 - **Add Movies**: Paste IMDB URL, auto-fetch metadata
 - **Ratings**: Rate movies 1-10, add notes
 - **Statistics**: Charts showing your watching habits
 - **Widgets**: Quick stats on home screen
 - **Search & Sort**: Find movies easily
-- **Profile Settings**: Edit name, manage privacy
+
+### Social Features
+- **Discover Users**: Search for other movie enthusiasts by name or username
+- **Follow System**: Follow users to see their public movie collections
 - **Public Profiles**: Share your movie collection with friends
+- **User Profiles**: View other users' public movies and stats
 - **Privacy Controls**: Toggle public profile, control movie visibility
+
+### Profile Management
+- **Profile Settings**: Edit name, manage privacy
+- **Following List**: See who you're following
+- **Followers**: See who follows you
 
 ## Troubleshooting
 
@@ -165,6 +175,14 @@ service cloud.firestore {
                        request.resource.data.userId == request.auth.uid;
       allow update, delete: if request.auth != null &&
                                resource.data.userId == request.auth.uid;
+    }
+
+    match /follows/{followId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+                       request.resource.data.followerId == request.auth.uid;
+      allow delete: if request.auth != null &&
+                       resource.data.followerId == request.auth.uid;
     }
   }
 }

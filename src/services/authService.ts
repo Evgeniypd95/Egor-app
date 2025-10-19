@@ -31,6 +31,8 @@ export const signUp = async (email: string, password: string, displayName: strin
       profileUrl,
       publicProfileEnabled: false,
       createdAt: Timestamp.now(),
+      followers: [],
+      following: [],
     };
 
     await setDoc(doc(db, 'users', user.uid), userData);

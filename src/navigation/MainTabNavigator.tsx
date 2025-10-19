@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
+import DiscoverScreen from '../screens/DiscoverScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import MoviesStackNavigator from './MoviesStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigator';
@@ -50,6 +51,14 @@ export default function MainTabNavigator() {
         options={{
           tabBarLabel: 'Add',
           tabBarIcon: ({ color }) => <TabIcon emoji="➕" color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Discover"
+        component={DiscoverScreen}
+        options={{
+          tabBarLabel: 'Discover',
+          tabBarIcon: ({ color }) => <TabIcon emoji="🔍" color={color} />,
         }}
       />
       <Tab.Screen
