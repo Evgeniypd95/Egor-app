@@ -124,11 +124,13 @@ pkill -f "expo"
 npm start
 ```
 
-### Module Not Found
+### Cannot Find Module Error
 ```bash
+# Clear everything and reinstall
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps
 npx expo install expo-asset expo-font
+npx expo start --clear
 ```
 
 ### App Won't Load
