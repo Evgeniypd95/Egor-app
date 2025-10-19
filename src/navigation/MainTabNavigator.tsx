@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import MoviesStackNavigator from './MoviesStackNavigator';
+import ProfileStackNavigator from './ProfileStackNavigator';
 import { MainTabParamList } from '../types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -62,7 +62,7 @@ export default function MainTabNavigator() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackNavigator}
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color }) => <TabIcon emoji="👤" color={color} />,

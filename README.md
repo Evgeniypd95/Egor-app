@@ -115,6 +115,9 @@ The app will show warnings about missing icons - this is OK for development! The
 - **Statistics**: Charts showing your watching habits
 - **Widgets**: Quick stats on home screen
 - **Search & Sort**: Find movies easily
+- **Profile Settings**: Edit name, manage privacy
+- **Public Profiles**: Share your movie collection with friends
+- **Privacy Controls**: Toggle public profile, control movie visibility
 
 ## Troubleshooting
 

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { logOut } from '../services/authService';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }: any) {
   const { userData, user } = useAuth();
 
   const handleLogout = () => {
@@ -40,16 +40,37 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Profile Settings</Text>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => {
+            console.log('[PROFILE] Edit Profile pressed');
+            navigation.navigate('EditProfile');
+          }}
+        >
           <Text style={styles.menuItemText}>Edit Profile</Text>
+          <Text style={styles.menuItemArrow}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => {
+            console.log('[PROFILE] Public Profile pressed');
+            navigation.navigate('PublicProfile');
+          }}
+        >
           <Text style={styles.menuItemText}>Public Profile</Text>
+          <Text style={styles.menuItemArrow}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => {
+            console.log('[PROFILE] Privacy Settings pressed');
+            navigation.navigate('PrivacySettings');
+          }}
+        >
           <Text style={styles.menuItemText}>Privacy Settings</Text>
+          <Text style={styles.menuItemArrow}>›</Text>
         </TouchableOpacity>
       </View>
 
@@ -125,6 +146,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
@@ -133,6 +157,10 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     color: '#1a1a1a',
+  },
+  menuItemArrow: {
+    fontSize: 24,
+    color: '#999',
   },
   logoutButton: {
     backgroundColor: '#FF3B30',
