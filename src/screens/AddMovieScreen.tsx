@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
@@ -152,13 +153,14 @@ export default function AddMovieScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Add Movie</Text>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Add Movie</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
@@ -272,11 +274,16 @@ export default function AddMovieScreen({ navigation }: any) {
           )}
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -286,10 +293,12 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingTop: 10, // Reduced top padding since SafeAreaView handles status bar
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginTop: 10, // Additional top margin for better spacing
     marginBottom: 24,
     color: '#1a1a1a',
   },
