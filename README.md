@@ -1,94 +1,157 @@
-# Movie Tracker App
+# Movie Tracker App - Setup & Run Guide
 
-A React Native mobile app for tracking movies watched. Users can paste IMDB links, the app fetches movie metadata, and users can add their watch date and personal rating. Features customizable widgets, statistics, and shareable public profiles.
+A React Native app for tracking movies you've watched with ratings, statistics, and IMDB integration.
 
-## Features
+## Quick Start (5 Steps)
 
-### Core Features (Implemented)
-- **Authentication**: Email/password authentication with Firebase
-- **Add Movies**: Paste IMDB URL to fetch complete movie metadata
-- **Movie Management**: View, edit, and delete movies
-- **Statistics Dashboard**: Comprehensive statistics with charts
-- **Home Widgets**: Quick stats and insights on home screen
-- **Movie List**: Grid/list view with search and sort functionality
-
-### Tech Stack
-- **Frontend**: React Native with Expo
-- **Backend**: Firebase (Authentication, Firestore)
-- **API**: OMDB API for IMDB data
-- **State Management**: React Context API
-- **Navigation**: React Navigation v7
-- **Charts**: react-native-chart-kit
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v16 or later)
-- npm or yarn
-- Expo CLI
-- iOS Simulator (Mac) or Android Emulator
-- Firebase account
-- OMDB API key (free)
-
-### 1. Install Dependencies
+### Step 1: Install Dependencies
 
 ```bash
-npm install
+npm install --legacy-peer-deps
+npx expo install expo-asset expo-font
 ```
 
-### 2. Firebase Setup
+### Step 2: Setup Firebase
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project (or use existing)
-3. Enable **Authentication** with Email/Password provider
-4. Create a **Firestore Database** (start in test mode for development)
-5. Get your Firebase config from Project Settings > General > Your apps
-6. Register a web app if you haven't already
+1. Go to https://console.firebase.google.com/
+2. Create a new project (name: movie-tracker)
+3. Enable **Authentication**:
+   - Click "Authentication" → "Get started"
+   - Enable "Email/Password" sign-in method
+4. Create **Firestore Database**:
+   - Click "Firestore Database" → "Create database"
+   - Start in "test mode"
+5. Get your config:
+   - Click gear icon → "Project settings"
+   - Scroll to "Your apps" → Click web icon (</>)
+   - Copy the config values
 
-### 3. OMDB API Key
+### Step 3: Setup OMDB API
 
-1. Go to [OMDB API](https://www.omdbapi.com/apikey.aspx)
-2. Request a free API key
-3. Verify your email to activate the key
+1. Go to https://www.omdbapi.com/apikey.aspx
+2. Request FREE API key (1,000 requests/day)
+3. Check email and click activation link
+4. Copy your API key
 
-### 4. Environment Variables
-
-Create a `.env` file in the root directory:
+### Step 4: Create .env File
 
 ```bash
 cp .env.example .env
 ```
 
-Update the `.env` file with your credentials:
+Edit `.env` with your credentials:
 
 ```env
-# Firebase Configuration
-EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key_here
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+# Firebase (from step 2)
+EXPO_PUBLIC_FIREBASE_API_KEY=AIza...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=movie-tracker-xxx.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=movie-tracker-xxx
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=movie-tracker-xxx.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+EXPO_PUBLIC_FIREBASE_APP_ID=1:123456789:web:...
 
-# OMDB API Configuration
-EXPO_PUBLIC_OMDB_API_KEY=your_omdb_api_key_here
+# OMDB (from step 3)
+EXPO_PUBLIC_OMDB_API_KEY=your_8_digit_key
 ```
 
-### 5. Firestore Security Rules
+### Step 5: Run the App
 
-Update your Firestore security rules:
+**Option A: iOS Simulator (Mac only - RECOMMENDED)**
+```bash
+npm start
+# When menu appears, press 'i'
+```
+
+**Option B: Android Emulator**
+```bash
+npm start
+# When menu appears, press 'a'
+```
+
+**Option C: Your Phone**
+1. Install "Expo Go" app from App Store or Play Store
+2. Make sure phone is on same WiFi as computer
+3. Run `npm start`
+4. Scan the QR code with your phone
+
+## ⚠️ Important Notes
+
+### DO NOT Press 'w' for Web!
+This is a **mobile app** using native components. Web mode will NOT work.
+
+When you see:
+```
+› Press i │ open iOS simulator     ← Choose this (Mac)
+› Press a │ open Android emulator
+› Press w │ open web               ← DON'T use this!
+```
+
+### SDK Version Issues
+
+If you get "SDK mismatch" error:
+- **Use iOS Simulator** (supports any SDK version)
+- **OR update Expo Go** app on your phone to latest version
+- **OR** run directly: `npm run ios` or `npm run android`
+
+### Missing Asset Files Error
+
+The app will show warnings about missing icons - this is OK for development! The app will still work.
+
+## Testing the App
+
+1. **Sign Up**: Create a new account
+2. **Add Movie**:
+   - Go to "Add" tab
+   - Paste: `https://www.imdb.com/title/tt0111161/`
+   - Click "Fetch Movie"
+   - Add rating and save
+3. **View Stats**: Check the Statistics tab
+
+## Features
+
+- **Authentication**: Email/password login & signup
+- **Add Movies**: Paste IMDB URL, auto-fetch metadata
+- **Ratings**: Rate movies 1-10, add notes
+- **Statistics**: Charts showing your watching habits
+- **Widgets**: Quick stats on home screen
+- **Search & Sort**: Find movies easily
+
+## Troubleshooting
+
+### Port 8081 Already in Use
+```bash
+pkill -f "expo"
+npm start
+```
+
+### Module Not Found
+```bash
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
+npx expo install expo-asset expo-font
+```
+
+### App Won't Load
+1. Make sure `.env` file exists and is filled in
+2. Check Firebase and OMDB credentials are correct
+3. Try: `npx expo start --clear`
+
+### Web Bundle Error (500)
+**Don't use web mode!** Press 'i' for iOS or 'a' for Android instead.
+
+## Firebase Security Rules (For Production)
+
+Update Firestore rules before deploying:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection
     match /users/{userId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Movies collection
     match /movies/{movieId} {
       allow read: if request.auth != null &&
                      (resource.data.userId == request.auth.uid ||
@@ -102,163 +165,60 @@ service cloud.firestore {
 }
 ```
 
-### 6. Run the App
+## Tech Stack
 
-```bash
-# Start the Expo development server
-npm start
-
-# Or run directly on iOS
-npm run ios
-
-# Or run directly on Android
-npm run android
-```
+- React Native + Expo
+- TypeScript
+- Firebase (Auth + Firestore)
+- OMDB API
+- React Navigation
+- react-native-chart-kit
 
 ## Project Structure
 
 ```
 src/
-├── config/          # Firebase configuration
-├── context/         # React Context (Auth, Movies)
-├── navigation/      # Navigation setup
-├── screens/         # App screens
-│   ├── LoginScreen.tsx
-│   ├── SignupScreen.tsx
-│   ├── ForgotPasswordScreen.tsx
-│   ├── HomeScreen.tsx
-│   ├── AddMovieScreen.tsx
-│   ├── MoviesListScreen.tsx
-│   ├── MovieDetailsScreen.tsx
-│   ├── StatisticsScreen.tsx
-│   └── ProfileScreen.tsx
-├── services/        # API services
-│   ├── authService.ts
-│   ├── movieService.ts
-│   └── omdbService.ts
-├── types/           # TypeScript types
-└── utils/           # Utility functions
+├── config/         # Firebase setup
+├── context/        # Auth & Movie state
+├── navigation/     # Navigation setup
+├── screens/        # All app screens
+├── services/       # API services
+└── types/          # TypeScript types
 ```
 
-## Usage Guide
+## Commands Reference
 
-### Adding a Movie
+```bash
+# Start development server
+npm start
 
-1. Tap the **Add** tab
-2. Paste an IMDB URL (e.g., `https://www.imdb.com/title/tt0111161/`)
-3. Tap **Fetch Movie**
-4. Review the movie details
-5. Select watch date
-6. Add your rating (1-10)
-7. Optionally add notes
-8. Toggle public visibility
-9. Tap **Save Movie**
+# Run on iOS
+npm run ios
 
-### Viewing Statistics
+# Run on Android
+npm run android
 
-Navigate to the **Stats** tab to see:
-- Total movies watched
-- Average rating
-- Monthly progress chart
-- Rating distribution
-- Genre breakdown
-- Top directors
+# Clear cache
+npx expo start --clear
 
-### Managing Movies
-
-- **Search**: Use the search bar on Movies screen
-- **Sort**: Sort by date, rating, or title
-- **View Details**: Tap any movie card
-- **Delete**: Open movie details and tap Delete
-- **Edit**: (Coming soon)
-
-## Data Models
-
-### User Collection
-```typescript
-{
-  uid: string
-  email: string
-  displayName: string
-  profileUrl: string
-  publicProfileEnabled: boolean
-  createdAt: timestamp
-}
+# Check for errors
+npx tsc --noEmit
 ```
 
-### Movies Collection
-```typescript
-{
-  id: string
-  userId: string
-  imdbId: string
-  imdbUrl: string
-  title: string
-  year: string
-  poster: string
-  director: string
-  actors: string
-  plot: string
-  genre: string
-  runtime: string
-  imdbRating: number
-  userRating: number
-  watchedDate: timestamp
-  notes?: string
-  isPublic: boolean
-  createdAt: timestamp
-  updatedAt: timestamp
-}
-```
+## Support
 
-## Future Enhancements
+**Common Issue**: App won't start
+- ✅ Check `.env` file is created and filled
+- ✅ Firebase Authentication enabled
+- ✅ Firestore Database created
+- ✅ OMDB API key activated
+- ✅ Using iOS/Android, NOT web
 
-### Phase 2 Features (To Be Implemented)
-- [ ] Edit movie functionality
-- [ ] Public profile web viewer
-- [ ] Share movies on social media
-- [ ] Export data (CSV, JSON)
-- [ ] Advanced filtering (by genre, year, director)
-- [ ] Movie recommendations
-- [ ] Watch with friends feature
-- [ ] Custom lists/collections
-- [ ] Dark mode
-- [ ] Push notifications
+**Still stuck?**
+1. Delete `node_modules` and reinstall
+2. Clear Expo cache: `npx expo start --clear`
+3. Make sure using iOS Simulator or Android Emulator, NOT web
 
-## Troubleshooting
+---
 
-### Common Issues
-
-**1. Firebase Connection Error**
-- Verify your Firebase config in `.env`
-- Check that Firestore is enabled
-- Ensure Authentication is enabled with Email/Password
-
-**2. OMDB API Error**
-- Verify your API key is active
-- Check you haven't exceeded the daily limit (1,000 requests/day for free tier)
-- Ensure the IMDB URL is valid
-
-**3. App Won't Start**
-- Clear Expo cache: `npx expo start -c`
-- Delete node_modules and reinstall: `rm -rf node_modules && npm install`
-- Check that all peer dependencies are installed
-
-**4. TypeScript Errors**
-- Run `npx tsc --noEmit` to check for type errors
-- Ensure all imports are correct
-
-## Contributing
-
-This is a personal project, but suggestions and feedback are welcome!
-
-## License
-
-MIT License - Feel free to use this project for learning or personal use.
-
-## Acknowledgments
-
-- Movie data provided by [OMDB API](https://www.omdbapi.com/)
-- Icons by [React Native](https://reactnative.dev/)
-- Built with [Expo](https://expo.dev/)
-- Backend by [Firebase](https://firebase.google.com/)
+**Ready to track your movies!** 🎬
