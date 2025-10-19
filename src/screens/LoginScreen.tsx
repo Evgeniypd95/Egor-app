@@ -22,16 +22,21 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    console.log('[LOGIN] Login button pressed');
     if (!email || !password) {
+      console.log('[LOGIN] Missing email or password');
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     try {
       setLoading(true);
+      console.log('[LOGIN] Calling signIn...');
       await signIn(email, password);
+      console.log('[LOGIN] SignIn successful');
       // Navigation will be handled by auth state change
     } catch (error: any) {
+      console.error('[LOGIN] Login failed:', error);
       Alert.alert('Login Failed', error.message);
     } finally {
       setLoading(false);

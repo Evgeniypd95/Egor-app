@@ -46,7 +46,9 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const refreshMovies = async () => {
+    console.log('[MOVIE_CONTEXT] Refreshing movies...');
     if (!user) {
+      console.log('[MOVIE_CONTEXT] No user, clearing movies');
       setMovies([]);
       setLoading(false);
       return;
@@ -54,11 +56,13 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     try {
       setLoading(true);
+      console.log('[MOVIE_CONTEXT] Fetching movies for user:', user.uid);
       const fetchedMovies = await getUserMovies(user.uid);
+      console.log('[MOVIE_CONTEXT] Fetched', fetchedMovies.length, 'movies');
       setMovies(fetchedMovies);
       calculateStats(fetchedMovies);
     } catch (error) {
-      console.error('Error fetching movies:', error);
+      console.error('[MOVIE_CONTEXT] Error fetching movies:', error);
     } finally {
       setLoading(false);
     }

@@ -12,12 +12,15 @@ import { User } from '../types';
 
 // Sign up new user
 export const signUp = async (email: string, password: string, displayName: string): Promise<FirebaseUser> => {
+  console.log('[AUTH] Attempting signup:', { email, displayName });
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    console.log('[AUTH] User created:', user.uid);
 
     // Update profile with display name
     await updateProfile(user, { displayName });
+    console.log('[AUTH] Profile updated with displayName');
 
     // Create user document in Firestore
     const profileUrl = generateProfileUrl(displayName);
@@ -31,19 +34,24 @@ export const signUp = async (email: string, password: string, displayName: strin
     };
 
     await setDoc(doc(db, 'users', user.uid), userData);
+    console.log('[AUTH] Firestore user document created');
 
     return user;
   } catch (error: any) {
+    console.error('[AUTH] Signup error:', error.message, error.code);
     throw new Error(error.message);
   }
 };
 
 // Sign in existing user
 export const signIn = async (email: string, password: string): Promise<FirebaseUser> => {
+  console.log('[AUTH] Attempting signin:', email);
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log('[AUTH] Signin successful:', userCredential.user.uid);
     return userCredential.user;
   } catch (error: any) {
+    console.error('[AUTH] Signin error:', error.message, error.code);
     throw new Error(error.message);
   }
 };

@@ -25,26 +25,33 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
+    console.log('[SIGNUP] Signup button pressed');
     if (!displayName || !email || !password || !confirmPassword) {
+      console.log('[SIGNUP] Missing fields');
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     if (password !== confirmPassword) {
+      console.log('[SIGNUP] Passwords do not match');
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
+      console.log('[SIGNUP] Password too short');
       Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
     try {
       setLoading(true);
+      console.log('[SIGNUP] Calling signUp...');
       await signUp(email, password, displayName);
+      console.log('[SIGNUP] Signup successful');
       // Navigation will be handled by auth state change
     } catch (error: any) {
+      console.error('[SIGNUP] Signup failed:', error);
       Alert.alert('Signup Failed', error.message);
     } finally {
       setLoading(false);

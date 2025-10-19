@@ -34,18 +34,26 @@ export default function AddMovieScreen({ navigation }: any) {
   const [isPublic, setIsPublic] = useState(false);
 
   const handleFetchMovie = async () => {
+    console.log('[ADD_MOVIE] Fetch button pressed');
+    console.log('[ADD_MOVIE] IMDB URL:', imdbUrl);
+
     if (!imdbUrl.trim()) {
+      console.log('[ADD_MOVIE] Empty URL');
       Alert.alert('Error', 'Please enter an IMDB URL');
       return;
     }
 
     if (!isValidImdbUrl(imdbUrl)) {
+      console.log('[ADD_MOVIE] Invalid URL format');
       Alert.alert('Error', 'Please enter a valid IMDB URL');
       return;
     }
 
     const imdbId = extractImdbId(imdbUrl);
+    console.log('[ADD_MOVIE] Extracted IMDB ID:', imdbId);
+
     if (!imdbId) {
+      console.error('[ADD_MOVIE] Could not extract IMDB ID');
       Alert.alert('Error', 'Could not extract IMDB ID from URL');
       return;
     }
@@ -54,6 +62,7 @@ export default function AddMovieScreen({ navigation }: any) {
     if (user) {
       const exists = await checkMovieExists(user.uid, imdbId);
       if (exists) {
+        console.log('[ADD_MOVIE] Movie already exists');
         Alert.alert('Already Added', 'This movie is already in your collection');
         return;
       }
@@ -61,13 +70,17 @@ export default function AddMovieScreen({ navigation }: any) {
 
     try {
       setLoading(true);
+      console.log('[ADD_MOVIE] Fetching movie data...');
       const data = await fetchMovieByImdbId(imdbId);
       if (data) {
+        console.log('[ADD_MOVIE] Movie data received:', data.Title);
         setMovieData(data);
       } else {
+        console.error('[ADD_MOVIE] No data returned');
         Alert.alert('Error', 'Movie not found');
       }
     } catch (error: any) {
+      console.error('[ADD_MOVIE] Fetch error:', error);
       Alert.alert('Error', error.message);
     } finally {
       setLoading(false);
@@ -75,16 +88,24 @@ export default function AddMovieScreen({ navigation }: any) {
   };
 
   const handleSaveMovie = async () => {
-    if (!movieData || !user) return;
+    console.log('[ADD_MOVIE] Save button pressed');
+    if (!movieData || !user) {
+      console.error('[ADD_MOVIE] Missing movieData or user');
+      return;
+    }
 
     const rating = parseFloat(userRating);
+    console.log('[ADD_MOVIE] User rating:', rating);
+
     if (isNaN(rating) || rating < 1 || rating > 10) {
+      console.log('[ADD_MOVIE] Invalid rating');
       Alert.alert('Error', 'Please enter a rating between 1 and 10');
       return;
     }
 
     try {
       setSaving(true);
+      console.log('[ADD_MOVIE] Saving movie to Firestore...');
       await addMovie({
         userId: user.uid,
         imdbId: movieData.imdbID,
@@ -104,7 +125,10 @@ export default function AddMovieScreen({ navigation }: any) {
         isPublic,
       });
 
+      console.log('[ADD_MOVIE] Movie saved successfully');
       await refreshMovies();
+      console.log('[ADD_MOVIE] Movies refreshed');
+
       Alert.alert('Success', 'Movie added to your collection!', [
         {
           text: 'OK',
@@ -120,6 +144,7 @@ export default function AddMovieScreen({ navigation }: any) {
         },
       ]);
     } catch (error: any) {
+      console.error('[ADD_MOVIE] Save error:', error);
       Alert.alert('Error', error.message);
     } finally {
       setSaving(false);

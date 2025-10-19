@@ -30,15 +30,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[AUTH_CONTEXT] Setting up auth listener');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('[AUTH_CONTEXT] Auth state changed:', firebaseUser?.uid || 'logged out');
       setUser(firebaseUser);
 
       if (firebaseUser) {
         try {
+          console.log('[AUTH_CONTEXT] Fetching user data...');
           const data = await getUserData(firebaseUser.uid);
+          console.log('[AUTH_CONTEXT] User data loaded:', data?.displayName);
           setUserData(data);
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error('[AUTH_CONTEXT] Error fetching user data:', error);
         }
       } else {
         setUserData(null);
