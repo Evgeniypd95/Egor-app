@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { getUserByProfileUrl, followUser, unfollowUser, isFollowing } from '../services/userService';
+import { getUserData } from '../services/authService';
 import { getPublicMovies } from '../services/movieService';
 import { User, Movie } from '../types';
 
@@ -43,11 +44,38 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
 
     try {
       setLoading(true);
+      console.log('[USER_PROFILE] Loading profile for userId:', userId);
       
-      // Get user data
-      const userData = await getUserByProfileUrl(userId);
+      // Get user data - try both user ID and profile URL
+      let userData: User | null = null;
+      
+      // First try to get by user ID (if userId is actually a UID)
+      try {
+        console.log('[USER_PROFILE] Trying to get user by UID...');
+        userData = await getUserData(userId);
+        console.log('[USER_PROFILE] User found by UID:', userData?.displayName);
+      } catch (error) {
+        console.log('[USER_PROFILE] Not a user ID, trying profile URL');
+      }
+      
+      // If not found by user ID, try by profile URL
       if (!userData) {
+        console.log('[USER_PROFILE] Trying to get user by profile URL...');
+        userData = await getUserByProfileUrl(userId);
+        console.log('[USER_PROFILE] User found by profile URL:', userData?.displayName);
+      }
+      
+      if (!userData) {
+        console.log('[USER_PROFILE] User not found with either method');
         Alert.alert('Error', 'User not found or profile is private');
+        navigation.goBack();
+        return;
+      }
+      
+      // Check if user has public profile enabled
+      console.log('[USER_PROFILE] User public profile enabled:', userData.publicProfileEnabled);
+      if (!userData.publicProfileEnabled) {
+        Alert.alert('Error', 'This user\'s profile is private');
         navigation.goBack();
         return;
       }

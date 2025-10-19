@@ -106,6 +106,36 @@ The app will show warnings about missing icons - this is OK for development! The
    - Click "Fetch Movie"
    - Add rating and save
 3. **View Stats**: Check the Statistics tab
+4. **Test Social Features**:
+   - Go to "Discover" tab
+   - Search for other users
+   - Follow users and view their profiles
+
+## How to Use Social Features
+
+### 🔍 Discovering Users
+1. **Open Discover Tab**: Tap the "Discover" tab in the bottom navigation
+2. **Search Users**: Type a name or username in the search box
+3. **View Results**: See matching users with their follower counts
+4. **Follow Users**: Tap "Follow" to follow someone
+
+### 👥 Following System
+- **Follow Users**: Tap "Follow" on any user in search results or their profile
+- **View Following**: Switch to "Following" tab to see all users you follow
+- **Unfollow**: Tap "Following" button to unfollow a user
+- **Real-time Updates**: Follow counts update immediately
+
+### 👤 User Profiles
+- **View Profile**: Tap on any user to see their profile
+- **Public Movies**: See all movies they've marked as public
+- **User Stats**: View their movie count, followers, and following
+- **Follow/Unfollow**: Manage your relationship directly from their profile
+
+### 🔗 Sharing Your Profile
+1. **Enable Public Profile**: Go to Profile → Privacy Settings → Toggle "Public Profile"
+2. **Share Link**: Go to Profile → Public Profile → Copy/Share your link
+3. **Mark Movies Public**: When adding movies, toggle "Make Public" option
+4. **Profile URL**: Your profile will be accessible at `https://movietracker.app/u/your-username`
 
 ## Features
 
@@ -202,12 +232,26 @@ service cloud.firestore {
 ```
 src/
 ├── config/         # Firebase setup
-├── context/        # Auth & Movie state
-├── navigation/     # Navigation setup
+├── context/        # Auth & Movie state management
+├── navigation/     # Navigation setup (tabs, stacks)
 ├── screens/        # All app screens
+│   ├── Auth/       # Login, Signup, ForgotPassword
+│   ├── Main/       # Home, AddMovie, Discover, Statistics
+│   ├── Profile/    # Profile, EditProfile, PrivacySettings, UserProfile
+│   └── Movies/     # MoviesList, MovieDetails
 ├── services/       # API services
-└── types/          # TypeScript types
+│   ├── authService.ts      # User authentication
+│   ├── movieService.ts     # Movie CRUD operations
+│   ├── omdbService.ts      # OMDB API integration
+│   └── userService.ts      # User search & following
+└── types/          # TypeScript type definitions
 ```
+
+### Key Social Features Files
+- `screens/DiscoverScreen.tsx` - User search and discovery
+- `screens/UserProfileScreen.tsx` - View other users' profiles
+- `services/userService.ts` - Follow/unfollow, search functionality
+- `types/index.ts` - Following and user search types
 
 ## Commands Reference
 
