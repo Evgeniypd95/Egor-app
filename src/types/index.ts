@@ -119,4 +119,5 @@ export type ProfileStackParamList = {
 export type MoviesStackParamList = {
   MoviesList: undefined;
   MovieDetails: { movieId: string };
+  EditMovie: { movieId: string };
 };

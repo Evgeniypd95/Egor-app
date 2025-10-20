@@ -132,7 +132,10 @@ export default function MovieDetailsScreen({ route, navigation }: MovieDetailsSc
         )}
 
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.editButton} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditMovie', { movieId })}
+          >
             <Text style={styles.editButtonText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
