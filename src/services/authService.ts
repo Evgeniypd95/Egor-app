@@ -29,7 +29,7 @@ export const signUp = async (email: string, password: string, displayName: strin
       email: user.email || '',
       displayName,
       profileUrl,
-      publicProfileEnabled: false,
+      publicProfileEnabled: true,
       createdAt: Timestamp.now(),
       followers: [],
       following: [],

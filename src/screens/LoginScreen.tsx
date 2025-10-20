@@ -101,6 +101,17 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           >
             <Text style={styles.secondaryButtonText}>Create Account</Text>
           </TouchableOpacity>
+
+          <View style={{ alignItems: 'center', marginTop: 12 }}>
+            <Text style={{ fontSize: 12, color: '#666' }}>
+              By continuing you agree to our
+              <Text> </Text>
+              <Text style={{ color: '#007AFF' }} onPress={() => navigation.navigate('Terms')}>Terms</Text>
+              <Text> and </Text>
+              <Text style={{ color: '#007AFF' }} onPress={() => navigation.navigate('PrivacyPolicy')}>Privacy Policy</Text>
+              .
+            </Text>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>

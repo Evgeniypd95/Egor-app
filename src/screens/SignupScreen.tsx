@@ -23,6 +23,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [accepted, setAccepted] = useState(true);
 
   const handleSignup = async () => {
     console.log('[SIGNUP] Signup button pressed');
@@ -41,6 +42,11 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     if (password.length < 6) {
       console.log('[SIGNUP] Password too short');
       Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+
+    if (!accepted) {
+      Alert.alert('Terms Required', 'Please accept the Terms & Conditions and Privacy Policy to continue');
       return;
     }
 
@@ -76,6 +82,16 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
               onChangeText={setDisplayName}
               editable={!loading}
             />
+
+            <View style={styles.legalBox}>
+              <TouchableOpacity onPress={() => setAccepted(!accepted)} style={styles.checkboxRow}>
+                <View style={[styles.checkbox, accepted && styles.checkboxChecked]} />
+                <Text style={styles.checkboxLabel}>I agree to the </Text>
+                <Text style={styles.link} onPress={() => navigation.navigate('Terms')}>Terms</Text>
+                <Text style={styles.checkboxLabel}> and </Text>
+                <Text style={styles.link} onPress={() => navigation.navigate('PrivacyPolicy')}>Privacy Policy</Text>
+              </TouchableOpacity>
+            </View>
 
             <TextInput
               style={styles.input}
@@ -190,6 +206,35 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#e0e0e0',
     marginVertical: 32,
+  },
+  legalBox: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    marginRight: 8,
+    borderWidth: 2,
+    borderColor: '#007AFF',
+    backgroundColor: 'transparent',
+  },
+  checkboxChecked: {
+    backgroundColor: '#007AFF',
+  },
+  checkboxLabel: {
+    fontSize: 13,
+    color: '#333',
+  },
+  link: {
+    fontSize: 13,
+    color: '#007AFF',
   },
   secondaryButton: {
     alignItems: 'center',
