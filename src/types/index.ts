@@ -114,6 +114,10 @@ export type ProfileStackParamList = {
   PrivacySettings: undefined;
   PublicProfile: undefined;
   UserProfile: { userId: string };
+  Legal: undefined;
+  PrivacyPolicy: undefined;
+  Terms: undefined;
+  CommunityGuidelines: undefined;
 };
 
 export type MoviesStackParamList = {
