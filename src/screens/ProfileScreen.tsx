@@ -87,6 +87,22 @@ export default function ProfileScreen({ navigation }: any) {
             <Text style={styles.menuItemText}>Privacy Settings</Text>
             <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              console.log('[PROFILE] Legal pressed');
+              try {
+                navigation.navigate('Legal');
+              } catch (error) {
+                console.error('[PROFILE] Navigation error:', error);
+                Alert.alert('Error', 'Could not navigate to Legal');
+              }
+            }}
+          >
+            <Text style={styles.menuItemText}>Legal & Policies</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
