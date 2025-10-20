@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
@@ -243,6 +244,13 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
               <View style={styles.moviesList}>
                 {publicMovies.map((movie) => (
                   <View key={movie.id} style={styles.movieItem}>
+                    {movie.poster && movie.poster !== 'N/A' ? (
+                      <Image source={{ uri: movie.poster }} style={styles.poster} />
+                    ) : (
+                      <View style={styles.posterPlaceholder}>
+                        <Text style={styles.posterPlaceholderText}>No Image</Text>
+                      </View>
+                    )}
                     <View style={styles.movieInfo}>
                       <Text style={styles.movieTitle}>{movie.title}</Text>
                       <Text style={styles.movieYear}>({movie.year})</Text>
@@ -406,6 +414,27 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#e1e5e9',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  poster: {
+    width: 70,
+    height: 100,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  posterPlaceholder: {
+    width: 70,
+    height: 100,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  posterPlaceholderText: {
+    fontSize: 10,
+    color: '#888',
   },
   movieInfo: {
     flex: 1,
