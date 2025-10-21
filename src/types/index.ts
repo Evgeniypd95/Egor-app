@@ -96,6 +96,8 @@ export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   ForgotPassword: undefined;
+  PrivacyPolicy: undefined;
+  Terms: undefined;
   Main: undefined;
 };
 
