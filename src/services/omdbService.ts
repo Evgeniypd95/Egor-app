@@ -54,6 +54,43 @@ export const fetchMovieByImdbId = async (imdbId: string): Promise<OMDBMovie | nu
   }
 };
 
+// Fetch a single movie by title
+export const fetchMovieByTitle = async (title: string): Promise<OMDBMovie | null> => {
+  console.log('[OMDB] Fetching movie by title:', title);
+  console.log('[OMDB] API Key present:', !!OMDB_API_KEY);
+  try {
+    if (!OMDB_API_KEY) {
+      console.error('[OMDB] API key is missing!');
+      throw new Error('OMDB API key is not configured');
+    }
+
+    const url = `${OMDB_API_URL}?t=${encodeURIComponent(title)}&apikey=${OMDB_API_KEY}&plot=full`;
+    console.log('[OMDB] Request URL:', url.replace(OMDB_API_KEY, 'HIDDEN'));
+
+    const response = await fetch(url);
+    console.log('[OMDB] Response status:', response.status);
+
+    if (!response.ok) {
+      console.error('[OMDB] HTTP error:', response.status);
+      throw new Error('Failed to fetch movie data from OMDB');
+    }
+
+    const data = await response.json();
+    console.log('[OMDB] Response data:', data);
+
+    if (data.Response === 'False') {
+      console.error('[OMDB] OMDB error:', data.Error);
+      throw new Error(data.Error || 'Movie not found');
+    }
+
+    console.log('[OMDB] Movie fetched successfully:', data.Title);
+    return data as OMDBMovie;
+  } catch (error: any) {
+    console.error('[OMDB] Fetch error:', error.message);
+    throw new Error(error.message || 'Failed to fetch movie data');
+  }
+};
+
 // Search movies by title (optional feature)
 export const searchMoviesByTitle = async (title: string): Promise<OMDBMovie[]> => {
   try {
