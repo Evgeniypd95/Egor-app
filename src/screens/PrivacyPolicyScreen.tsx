@@ -59,7 +59,7 @@ export default function PrivacyPolicyScreen() {
           • Withdraw consent at any time.{'\n'}
           • Object to or restrict processing.{'\n'}
           • Port your data to another service.{'\n'}
-          To exercise these rights, contact us at privacy@example.com.
+          To exercise these rights, contact us at contact.movietracker@gmail.com.
         </Text>
 
         <Text style={styles.heading}>7. Children’s Privacy</Text>
@@ -83,7 +83,7 @@ export default function PrivacyPolicyScreen() {
 
         <Text style={styles.heading}>10. Contact</Text>
         <Text style={styles.paragraph}>
-          For privacy questions or data requests, email: privacy@example.com
+          For privacy questions or data requests, email: contact.movietracker@gmail.com
         </Text>
 
         <Text style={styles.small}>Last updated: 2025-10-24</Text>

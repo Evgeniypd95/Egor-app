@@ -10,7 +10,7 @@ export default function CommunityGuidelinesScreen() {
         <Text style={styles.paragraph}>
           Be respectful. No harassment, hate, spam, or illegal content. Share
           only content you have the right to share. Report abuse via the Report
-          link or email safety@example.com.
+          link or email contact.movietracker@gmail.com.
         </Text>
         <Text style={styles.heading}>Enforcement</Text>
         <Text style={styles.paragraph}>

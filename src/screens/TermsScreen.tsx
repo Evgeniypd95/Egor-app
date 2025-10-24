@@ -96,7 +96,7 @@ export default function TermsScreen() {
 
         <Text style={styles.heading}>12. Contact</Text>
         <Text style={styles.paragraph}>
-          For legal or support inquiries, contact us at legal@example.com
+          For legal or support inquiries, contact us at contact.movietracker@gmail.com
         </Text>
 
         <Text style={styles.small}>Last updated: 2025-10-24</Text>
