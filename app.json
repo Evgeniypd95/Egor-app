@@ -15,11 +15,11 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.movietracker.app"
+      "bundleIdentifier": "com.evgenypavlov.movietracker"
     },
 
     "android": {
-      "package": "com.movietracker.app",
+      "package": "com.evgenypavlov.movietracker",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#007AFF"
