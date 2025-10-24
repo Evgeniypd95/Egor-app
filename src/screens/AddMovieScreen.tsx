@@ -165,6 +165,12 @@ export default function AddMovieScreen({ navigation }: any) {
     try {
       setSaving(true);
       console.log("[ADD_MOVIE] Saving movie to Firestore...");
+
+      // Extract Rotten Tomatoes rating if available
+      const rottenTomatoesRating = movieData.Ratings?.find(
+        (rating) => rating.Source === "Rotten Tomatoes",
+      )?.Value;
+
       await addMovie({
         userId: user.uid,
         imdbId: movieData.imdbID,
@@ -179,6 +185,7 @@ export default function AddMovieScreen({ navigation }: any) {
         runtime: movieData.Runtime,
         imdbRating: parseFloat(movieData.imdbRating) || 0,
         userRating: rating,
+        rottenTomatoesRating,
         watchedDate: Timestamp.fromDate(watchedDate),
         notes,
         isPublic,
