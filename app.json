@@ -5,23 +5,32 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+
     "splash": {
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#007AFF"
     },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.movietracker.app"
     },
+
     "android": {
       "package": "com.movietracker.app",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#007AFF"
       }
     },
+
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/icon.png"
     },
+
     "plugins": [
       "expo-asset",
       "expo-font"
