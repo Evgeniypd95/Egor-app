@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -28,9 +29,11 @@ export default function MovieDetailsScreen({
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    loadMovie();
-  }, [movieId]);
+  useFocusEffect(
+    useCallback(() => {
+      loadMovie();
+    }, [movieId]),
+  );
 
   const loadMovie = async () => {
     try {
