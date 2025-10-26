@@ -178,8 +178,6 @@ export default function MovieDetailsScreen({
             <Text style={styles.sectionText}>{movie.notes}</Text>
           </View>
         )}
-
-<<<<<<< HEAD
         {userData?.uid === movie.userId && ( // Show actions only if user is logged in and owns the movie
           <View style={styles.actions}>
             <TouchableOpacity
@@ -201,27 +199,6 @@ export default function MovieDetailsScreen({
             </TouchableOpacity>
           </View>
         )}
-=======
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate("EditMovie", { movieId })}
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.deleteButton, deleting && styles.buttonDisabled]}
-            onPress={handleDelete}
-            disabled={deleting}
-          >
-            {deleting ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            )}
-          </TouchableOpacity>
-        </View>
->>>>>>> f113f431947d86b85d08725ce06fc1a17edd07fd
       </View>
     </ScrollView>
   );
