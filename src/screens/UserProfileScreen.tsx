@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,18 @@ import {
   ActivityIndicator,
   RefreshControl,
   Image,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuth } from '../context/AuthContext';
-import { getUserByProfileUrl, followUser, unfollowUser, isFollowing } from '../services/userService';
-import { getUserData } from '../services/authService';
-import { getPublicMovies } from '../services/movieService';
-import { User, Movie } from '../types';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../context/AuthContext";
+import {
+  getUserByProfileUrl,
+  followUser,
+  unfollowUser,
+  isFollowing,
+} from "../services/userService";
+import { getUserData } from "../services/authService";
+import { getPublicMovies } from "../services/movieService";
+import { User, Movie } from "../types";
 
 interface UserProfileScreenProps {
   route: {
@@ -26,7 +31,10 @@ interface UserProfileScreenProps {
   navigation: any;
 }
 
-export default function UserProfileScreen({ route, navigation }: UserProfileScreenProps) {
+export default function UserProfileScreen({
+  route,
+  navigation,
+}: UserProfileScreenProps) {
   const { user } = useAuth();
   const { userId } = route.params;
   const [userProfile, setUserProfile] = useState<User | null>(null);
@@ -45,42 +53,48 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
 
     try {
       setLoading(true);
-      console.log('[USER_PROFILE] Loading profile for userId:', userId);
-      
+      console.log("[USER_PROFILE] Loading profile for userId:", userId);
+
       // Get user data - try both user ID and profile URL
       let userData: User | null = null;
-      
+
       // First try to get by user ID (if userId is actually a UID)
       try {
-        console.log('[USER_PROFILE] Trying to get user by UID...');
+        console.log("[USER_PROFILE] Trying to get user by UID...");
         userData = await getUserData(userId);
-        console.log('[USER_PROFILE] User found by UID:', userData?.displayName);
+        console.log("[USER_PROFILE] User found by UID:", userData?.displayName);
       } catch (error) {
-        console.log('[USER_PROFILE] Not a user ID, trying profile URL');
+        console.log("[USER_PROFILE] Not a user ID, trying profile URL");
       }
-      
+
       // If not found by user ID, try by profile URL
       if (!userData) {
-        console.log('[USER_PROFILE] Trying to get user by profile URL...');
+        console.log("[USER_PROFILE] Trying to get user by profile URL...");
         userData = await getUserByProfileUrl(userId);
-        console.log('[USER_PROFILE] User found by profile URL:', userData?.displayName);
+        console.log(
+          "[USER_PROFILE] User found by profile URL:",
+          userData?.displayName,
+        );
       }
-      
+
       if (!userData) {
-        console.log('[USER_PROFILE] User not found with either method');
-        Alert.alert('Error', 'User not found or profile is private');
+        console.log("[USER_PROFILE] User not found with either method");
+        Alert.alert("Error", "User not found or profile is private");
         navigation.goBack();
         return;
       }
-      
+
       // Check if user has public profile enabled
-      console.log('[USER_PROFILE] User public profile enabled:', userData.publicProfileEnabled);
+      console.log(
+        "[USER_PROFILE] User public profile enabled:",
+        userData.publicProfileEnabled,
+      );
       if (!userData.publicProfileEnabled) {
-        Alert.alert('Error', 'This user\'s profile is private');
+        Alert.alert("Error", "This user's profile is private");
         navigation.goBack();
         return;
       }
-      
+
       setUserProfile(userData);
 
       // Get public movies
@@ -90,10 +104,9 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
       // Check if current user is following this user
       const following = await isFollowing(user.uid, userData.uid);
       setIsFollowingUser(following);
-
     } catch (error: any) {
-      console.error('[USER_PROFILE] Error loading profile:', error);
-      Alert.alert('Error', 'Failed to load user profile');
+      console.error("[USER_PROFILE] Error loading profile:", error);
+      Alert.alert("Error", "Failed to load user profile");
     } finally {
       setLoading(false);
     }
@@ -104,19 +117,19 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
 
     try {
       setFollowLoading(true);
-      
+
       if (isFollowingUser) {
         await unfollowUser(user.uid, userProfile.uid);
         setIsFollowingUser(false);
-        Alert.alert('Success', `Unfollowed ${userProfile.displayName}`);
+        Alert.alert("Success", `Unfollowed ${userProfile.displayName}`);
       } else {
         await followUser(user.uid, userProfile.uid);
         setIsFollowingUser(true);
-        Alert.alert('Success', `Now following ${userProfile.displayName}`);
+        Alert.alert("Success", `Now following ${userProfile.displayName}`);
       }
     } catch (error: any) {
-      console.error('[USER_PROFILE] Follow error:', error);
-      Alert.alert('Error', error.message);
+      console.error("[USER_PROFILE] Follow error:", error);
+      Alert.alert("Error", error.message);
     } finally {
       setFollowLoading(false);
     }
@@ -149,7 +162,7 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
           <Text style={styles.loadingText}>Loading profile...</Text>
@@ -160,10 +173,13 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
 
   if (!userProfile) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>User not found</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.backButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
@@ -172,7 +188,7 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
@@ -189,18 +205,22 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
             </View>
             <Text style={styles.displayName}>{userProfile.displayName}</Text>
             <Text style={styles.profileUrl}>@{userProfile.profileUrl}</Text>
-            
+
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>{publicMovies.length}</Text>
                 <Text style={styles.statLabel}>Movies</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>{userProfile.followers?.length || 0}</Text>
+                <Text style={styles.statNumber}>
+                  {userProfile.followers?.length || 0}
+                </Text>
                 <Text style={styles.statLabel}>Followers</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>{userProfile.following?.length || 0}</Text>
+                <Text style={styles.statNumber}>
+                  {userProfile.following?.length || 0}
+                </Text>
                 <Text style={styles.statLabel}>Following</Text>
               </View>
             </View>
@@ -209,19 +229,28 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
               <TouchableOpacity
                 style={[
                   styles.followButton,
-                  isFollowingUser ? styles.unfollowButton : styles.followButtonActive
+                  isFollowingUser
+                    ? styles.unfollowButton
+                    : styles.followButtonActive,
                 ]}
                 onPress={handleFollow}
                 disabled={followLoading}
               >
                 {followLoading ? (
-                  <ActivityIndicator size="small" color={isFollowingUser ? '#666' : '#fff'} />
+                  <ActivityIndicator
+                    size="small"
+                    color={isFollowingUser ? "#666" : "#fff"}
+                  />
                 ) : (
-                  <Text style={[
-                    styles.followButtonText,
-                    isFollowingUser ? styles.unfollowButtonText : styles.followButtonTextActive
-                  ]}>
-                    {isFollowingUser ? 'Following' : 'Follow'}
+                  <Text
+                    style={[
+                      styles.followButtonText,
+                      isFollowingUser
+                        ? styles.unfollowButtonText
+                        : styles.followButtonTextActive,
+                    ]}
+                  >
+                    {isFollowingUser ? "Following" : "Follow"}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -233,39 +262,56 @@ export default function UserProfileScreen({ route, navigation }: UserProfileScre
             <Text style={styles.sectionTitle}>
               Public Movies ({publicMovies.length})
             </Text>
-            
+
             {publicMovies.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>
-                  No public movies yet
-                </Text>
+                <Text style={styles.emptyStateText}>No public movies yet</Text>
               </View>
             ) : (
               <View style={styles.moviesList}>
                 {publicMovies.map((movie) => (
-                  <View key={movie.id} style={styles.movieItem}>
-                    {movie.poster && movie.poster !== 'N/A' ? (
-                      <Image source={{ uri: movie.poster }} style={styles.poster} />
-                    ) : (
-                      <View style={styles.posterPlaceholder}>
-                        <Text style={styles.posterPlaceholderText}>No Image</Text>
-                      </View>
-                    )}
-                    <View style={styles.movieInfo}>
-                      <Text style={styles.movieTitle}>{movie.title}</Text>
-                      <Text style={styles.movieYear}>({movie.year})</Text>
-                      <Text style={styles.movieGenre}>{movie.genre}</Text>
-                      <View style={styles.ratingContainer}>
-                        <Text style={styles.ratingLabel}>Rating:</Text>
-                        <Text style={styles.ratingValue}>{movie.userRating}/10</Text>
-                      </View>
-                      {movie.notes && (
-                        <Text style={styles.movieNotes} numberOfLines={2}>
-                          "{movie.notes}"
-                        </Text>
+                  <TouchableOpacity
+                    key={movie.id}
+                    onPress={() =>
+                      navigation.navigate("Movies", {
+                        screen: "MovieDetails",
+                        params: { movieId: movie.id },
+                      })
+                    }
+                  >
+                    <View style={styles.movieItem}>
+                      {movie.poster && movie.poster !== "N/A" ? (
+                        <Image
+                          source={{ uri: movie.poster }}
+                          style={styles.poster}
+                        />
+                      ) : (
+                        <View style={styles.posterPlaceholder}>
+                          <Text style={styles.posterPlaceholderText}>
+                            No Image
+                          </Text>
+                        </View>
                       )}
+                      <View style={styles.movieInfo}>
+                        <Text style={styles.movieTitle}>{movie.title}</Text>
+                        <Text style={styles.movieYear}>({movie.year})</Text>
+                        <Text style={styles.movieGenre}>{movie.genre}</Text>
+                        <View style={styles.ratingContainer}>
+                          <Text style={styles.ratingLabel}>
+                            {userProfile.displayName + "'s"} Rating:
+                          </Text>
+                          <Text style={styles.ratingValue}>
+                            {movie.userRating}/10
+                          </Text>
+                        </View>
+                        {movie.notes && (
+                          <Text style={styles.movieNotes} numberOfLines={2}>
+                            "{movie.notes}"
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
@@ -409,13 +455,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   movieItem: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e1e5e9',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    borderColor: "#e1e5e9",
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 12,
   },
   poster: {
@@ -447,42 +493,42 @@ const styles = StyleSheet.create({
   },
   movieYear: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   movieGenre: {
     fontSize: 14,
-    color: '#007AFF',
+    color: "#007AFF",
     marginBottom: 8,
   },
   ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   ratingLabel: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginRight: 8,
   },
   ratingValue: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
   },
   movieNotes: {
     fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
+    color: "#666",
+    fontStyle: "italic",
     lineHeight: 20,
   },
   emptyState: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 40,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
 });

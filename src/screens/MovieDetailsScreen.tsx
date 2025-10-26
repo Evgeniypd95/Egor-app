@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { getMovieById, deleteMovie } from '../services/movieService';
-import { useMovies } from '../context/MovieContext';
-import { Movie } from '../types';
+} from "react-native";
+import { getMovieById, deleteMovie } from "../services/movieService";
+import { useMovies } from "../context/MovieContext";
+import { Movie } from "../types";
+import { useAuth } from "../context/AuthContext";
+import { getUserData } from "../services/authService";
 
 interface MovieDetailsScreenProps {
   route: any;
@@ -24,6 +26,7 @@ export default function MovieDetailsScreen({ route, navigation }: MovieDetailsSc
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const { userData } = useAuth();
 
   useEffect(() => {
     loadMovie();
@@ -33,12 +36,33 @@ export default function MovieDetailsScreen({ route, navigation }: MovieDetailsSc
     try {
       setLoading(true);
       const data = await getMovieById(movieId);
-      setMovie(data);
+      if (data?.userId) {
+        const userDisplayName = await getMovieOwnerData(data.userId);
+        setMovie({
+          ...data,
+          userDisplayName,
+        });
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message);
       navigation.goBack();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getMovieOwnerData = async (userId: string) => {
+    if (userData?.uid === userId) {
+      return userData.displayName;
+    } else {
+      try {
+        console.log("[USER_PROFILE] Trying to get user by UID...");
+        const user = await getUserData(userId);
+        console.log("[USER_PROFILE] User found by UID:", user?.displayName);
+        return user?.displayName;
+      } catch (error) {
+        console.log("[USER_PROFILE] Not a user ID, trying profile URL");
+      }
     }
   };
 
@@ -95,7 +119,11 @@ export default function MovieDetailsScreen({ route, navigation }: MovieDetailsSc
 
         <View style={styles.ratingsContainer}>
           <View style={styles.ratingCard}>
-            <Text style={styles.ratingLabel}>Your Rating</Text>
+            <Text style={styles.ratingLabel}>
+              {userData?.displayName === movie.userDisplayName
+                ? "Your Rating"
+                : movie.userDisplayName + "'s Rating"}
+            </Text>
             <Text style={styles.ratingValue}>{movie.userRating}/10</Text>
           </View>
           <View style={styles.ratingCard}>
@@ -126,30 +154,36 @@ export default function MovieDetailsScreen({ route, navigation }: MovieDetailsSc
 
         {movie.notes && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Notes</Text>
+            <Text style={styles.sectionTitle}>
+              {userData?.displayName === movie.userDisplayName
+                ? "Your Notes"
+                : movie.userDisplayName + "'s Notes"}
+            </Text>
             <Text style={styles.sectionText}>{movie.notes}</Text>
           </View>
         )}
 
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('EditMovie', { movieId })}
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.deleteButton, deleting && styles.buttonDisabled]}
-            onPress={handleDelete}
-            disabled={deleting}
-          >
-            {deleting ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        {userData?.uid === movie.userId && ( // Show actions only if user is logged in and owns the movie
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate("EditMovie", { movieId })}
+            >
+              <Text style={styles.editButtonText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.deleteButton, deleting && styles.buttonDisabled]}
+              onPress={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.deleteButtonText}>Delete</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
