@@ -17,139 +17,77 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { useMovies } from "../context/MovieContext";
-import {
-  extractImdbId,
-  fetchMovieByImdbId,
-  fetchMovieByTitle,
-  isValidImdbUrl,
-} from "../services/omdbService";
+import { searchMoviesByTitle } from "../services/omdbService";
 import { addMovie, checkMovieExists } from "../services/movieService";
 import { OMDBMovie } from "../types";
 
 export default function AddMovieScreen({ navigation }: any) {
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const { refreshMovies } = useMovies();
-  const [imdbUrl, setImdbUrl] = useState("");
-  const [movieTitle, setMovieTitle] = useState("");
-  const [searchMode, setSearchMode] = useState<"url" | "title">("url");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [movieData, setMovieData] = useState<OMDBMovie | null>(null);
+  const [searchResults, setSearchResults] = useState<OMDBMovie[]>([]);
+  const [selectedMovie, setSelectedMovie] = useState<OMDBMovie | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const [watchedDate, setWatchedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userRating, setUserRating] = useState("");
   const [notes, setNotes] = useState("");
   const [isPublic, setIsPublic] = useState(false);
 
-  const handleFetchMovie = async () => {
-    console.log("[ADD_MOVIE] Fetch button pressed");
-    console.log("[ADD_MOVIE] Search mode:", searchMode);
+  const handleSearchMovies = async () => {
+    console.log("[ADD_MOVIE] Search button pressed");
+    console.log("[ADD_MOVIE] Search query:", searchQuery);
 
-    if (searchMode === "url") {
-      console.log("[ADD_MOVIE] IMDB URL:", imdbUrl);
+    if (!searchQuery.trim()) {
+      console.log("[ADD_MOVIE] Empty search query");
+      Alert.alert("Error", "Please enter a movie title to search");
+      return;
+    }
 
-      if (!imdbUrl.trim()) {
-        console.log("[ADD_MOVIE] Empty URL");
-        Alert.alert("Error", "Please enter an IMDB URL");
+    try {
+      setLoading(true);
+      setHasSearched(true);
+      console.log("[ADD_MOVIE] Searching for movies...");
+      const results = await searchMoviesByTitle(searchQuery);
+      console.log("[ADD_MOVIE] Search results count:", results.length);
+      setSearchResults(results);
+
+      if (results.length === 0) {
+        Alert.alert("No Results", "No movies found for your search query");
+      }
+    } catch (error: any) {
+      console.error("[ADD_MOVIE] Search error:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectMovie = async (movie: OMDBMovie) => {
+    console.log("[ADD_MOVIE] Movie selected:", movie.Title);
+
+    // Check if movie already exists
+    if (user) {
+      const exists = await checkMovieExists(user.uid, movie.imdbID);
+      if (exists) {
+        console.log("[ADD_MOVIE] Movie already exists");
+        Alert.alert(
+          "Already Added",
+          "This movie is already in your collection",
+        );
         return;
-      }
-
-      if (!isValidImdbUrl(imdbUrl)) {
-        console.log("[ADD_MOVIE] Invalid URL format");
-        Alert.alert("Error", "Please enter a valid IMDB URL");
-        return;
-      }
-
-      const imdbId = extractImdbId(imdbUrl);
-      console.log("[ADD_MOVIE] Extracted IMDB ID:", imdbId);
-
-      if (!imdbId) {
-        console.error("[ADD_MOVIE] Could not extract IMDB ID");
-        Alert.alert("Error", "Could not extract IMDB ID from URL");
-        return;
-      }
-
-      // Check if movie already exists
-      if (user) {
-        const exists = await checkMovieExists(user.uid, imdbId);
-        if (exists) {
-          console.log("[ADD_MOVIE] Movie already exists");
-          Alert.alert(
-            "Already Added",
-            "This movie is already in your collection",
-          );
-          return;
-        }
-      }
-
-      try {
-        setLoading(true);
-        console.log("[ADD_MOVIE] Fetching movie data by ID...");
-        const data = await fetchMovieByImdbId(imdbId);
-        if (data) {
-          console.log("[ADD_MOVIE] Movie data received:", data.Title);
-          setMovieData(data);
-        } else {
-          console.error("[ADD_MOVIE] No data returned");
-          Alert.alert("Error", "Movie not found");
-        }
-      } catch (error: any) {
-        console.error("[ADD_MOVIE] Fetch error:", error);
-        Alert.alert("Error", error.message);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Search by title
-      console.log("[ADD_MOVIE] Movie title:", movieTitle);
-
-      if (!movieTitle.trim()) {
-        console.log("[ADD_MOVIE] Empty title");
-        Alert.alert("Error", "Please enter a movie title");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        console.log("[ADD_MOVIE] Fetching movie data by title...");
-        const data = await fetchMovieByTitle(movieTitle);
-        if (data) {
-          console.log("[ADD_MOVIE] Movie data received:", data.Title);
-
-          // Check if movie already exists
-          if (user) {
-            const exists = await checkMovieExists(user.uid, data.imdbID);
-            if (exists) {
-              console.log("[ADD_MOVIE] Movie already exists");
-              Alert.alert(
-                "Already Added",
-                "This movie is already in your collection",
-              );
-              setLoading(false);
-              return;
-            }
-          }
-
-          setMovieData(data);
-          // Set the IMDB URL for saving
-          setImdbUrl(`https://www.imdb.com/title/${data.imdbID}/`);
-        } else {
-          console.error("[ADD_MOVIE] No data returned");
-          Alert.alert("Error", "Movie not found");
-        }
-      } catch (error: any) {
-        console.error("[ADD_MOVIE] Fetch error:", error);
-        Alert.alert("Error", error.message);
-      } finally {
-        setLoading(false);
       }
     }
+
+    setSelectedMovie(movie);
   };
 
   const handleSaveMovie = async () => {
     console.log("[ADD_MOVIE] Save button pressed");
-    if (!movieData || !user) {
-      console.error("[ADD_MOVIE] Missing movieData or user");
+    if (!selectedMovie || !user) {
+      console.error("[ADD_MOVIE] Missing selectedMovie or user");
       return;
     }
 
@@ -167,23 +105,24 @@ export default function AddMovieScreen({ navigation }: any) {
       console.log("[ADD_MOVIE] Saving movie to Firestore...");
 
       // Extract Rotten Tomatoes rating if available
-      const rottenTomatoesRating = movieData.Ratings?.find(
+      const rottenTomatoesRating = selectedMovie.Ratings?.find(
         (rating) => rating.Source === "Rotten Tomatoes",
       )?.Value;
 
       await addMovie({
         userId: user.uid,
-        imdbId: movieData.imdbID,
-        imdbUrl,
-        title: movieData.Title,
-        year: movieData.Year,
-        poster: movieData.Poster,
-        director: movieData.Director,
-        actors: movieData.Actors,
-        plot: movieData.Plot,
-        genre: movieData.Genre,
-        runtime: movieData.Runtime,
-        imdbRating: parseFloat(movieData.imdbRating) || 0,
+        userDisplayName: userData?.displayName,
+        imdbId: selectedMovie.imdbID,
+        imdbUrl: `https://www.imdb.com/title/${selectedMovie.imdbID}/`,
+        title: selectedMovie.Title,
+        year: selectedMovie.Year,
+        poster: selectedMovie.Poster,
+        director: selectedMovie.Director,
+        actors: selectedMovie.Actors,
+        plot: selectedMovie.Plot,
+        genre: selectedMovie.Genre,
+        runtime: selectedMovie.Runtime,
+        imdbRating: parseFloat(selectedMovie.imdbRating) || 0,
         userRating: rating,
         rottenTomatoesRating,
         watchedDate: Timestamp.fromDate(watchedDate),
@@ -200,9 +139,10 @@ export default function AddMovieScreen({ navigation }: any) {
           text: "OK",
           onPress: () => {
             // Reset form
-            setImdbUrl("");
-            setMovieTitle("");
-            setMovieData(null);
+            setSearchQuery("");
+            setSearchResults([]);
+            setSelectedMovie(null);
+            setHasSearched(false);
             setUserRating("");
             setNotes("");
             setWatchedDate(new Date());
@@ -218,103 +158,76 @@ export default function AddMovieScreen({ navigation }: any) {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.content}>
-            <Text style={styles.title}>Add Movie</Text>
+  const handleBackToSearch = () => {
+    setSelectedMovie(null);
+    setUserRating("");
+    setNotes("");
+    setWatchedDate(new Date());
+  };
 
-            <View style={styles.searchModeContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.modeButton,
-                  searchMode === "url" && styles.modeButtonActive,
-                ]}
-                onPress={() => setSearchMode("url")}
-                disabled={loading || !!movieData}
-              >
-                <Text
-                  style={[
-                    styles.modeButtonText,
-                    searchMode === "url" && styles.modeButtonTextActive,
-                  ]}
-                >
-                  By IMDB URL
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.modeButton,
-                  searchMode === "title" && styles.modeButtonActive,
-                ]}
-                onPress={() => setSearchMode("title")}
-                disabled={loading || !!movieData}
-              >
-                <Text
-                  style={[
-                    styles.modeButtonText,
-                    searchMode === "title" && styles.modeButtonTextActive,
-                  ]}
-                >
-                  By Title
-                </Text>
-              </TouchableOpacity>
-            </View>
+  const renderMovieItem = (movie: OMDBMovie) => (
+    <TouchableOpacity
+      key={movie.imdbID}
+      style={styles.movieItem}
+      onPress={() => handleSelectMovie(movie)}
+    >
+      {movie.Poster && movie.Poster !== "N/A" ? (
+        <Image source={{ uri: movie.Poster }} style={styles.poster} />
+      ) : (
+        <View style={styles.posterPlaceholder}>
+          <Text style={styles.posterPlaceholderText}>No Image</Text>
+        </View>
+      )}
+      <View style={styles.movieInfo}>
+        <Text style={styles.movieTitle}>{movie.Title}</Text>
+        <Text style={styles.movieYear}>({movie.Year})</Text>
+        <Text style={styles.movieGenre}>{movie.Genre}</Text>
+        <Text style={styles.movieDirector}>Directed by {movie.Director}</Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingLabel}>IMDB Rating:</Text>
+          <Text style={styles.ratingValue}>{movie.imdbRating}/10</Text>
+        </View>
+        <Text style={styles.moviePlot} numberOfLines={2}>
+          {movie.Plot}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-            <View style={styles.inputContainer}>
-              {searchMode === "url" ? (
-                <TextInput
-                  style={styles.input}
-                  placeholder="IMDB URL (e.g., https://www.imdb.com/title/tt0111161/)"
-                  value={imdbUrl}
-                  onChangeText={setImdbUrl}
-                  autoCapitalize="none"
-                  editable={!loading && !movieData}
-                />
-              ) : (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Movie title (e.g., The Shawshank Redemption)"
-                  value={movieTitle}
-                  onChangeText={setMovieTitle}
-                  autoCapitalize="words"
-                  editable={!loading && !movieData}
-                />
-              )}
+  if (selectedMovie) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
+        >
+          <ScrollView style={styles.scrollView}>
+            <View style={styles.content}>
               <TouchableOpacity
-                style={[styles.fetchButton, loading && styles.buttonDisabled]}
-                onPress={handleFetchMovie}
-                disabled={loading || !!movieData}
+                style={styles.backButton}
+                onPress={handleBackToSearch}
               >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Fetch Movie</Text>
-                )}
+                <Text style={styles.backButtonText}>← Back to Search</Text>
               </TouchableOpacity>
-            </View>
 
-            {movieData && (
-              <View style={styles.movieInfo}>
-                {movieData.Poster !== "N/A" && (
+              <View style={styles.selectedMovieInfo}>
+                {selectedMovie.Poster !== "N/A" && (
                   <Image
-                    source={{ uri: movieData.Poster }}
-                    style={styles.poster}
+                    source={{ uri: selectedMovie.Poster }}
+                    style={styles.posterLarge}
                   />
                 )}
-                <Text style={styles.movieTitle}>{movieData.Title}</Text>
+                <Text style={styles.movieTitleLarge}>
+                  {selectedMovie.Title}
+                </Text>
                 <Text style={styles.movieMeta}>
-                  {movieData.Year} • {movieData.Runtime} • IMDB:{" "}
-                  {movieData.imdbRating}
+                  {selectedMovie.Year} • {selectedMovie.Runtime} • IMDB:{" "}
+                  {selectedMovie.imdbRating}
                 </Text>
-                <Text style={styles.movieDirector}>
-                  Directed by {movieData.Director}
+                <Text style={styles.movieDirectorLarge}>
+                  Directed by {selectedMovie.Director}
                 </Text>
-                <Text style={styles.moviePlot}>{movieData.Plot}</Text>
+                <Text style={styles.moviePlotLarge}>{selectedMovie.Plot}</Text>
 
                 <View style={styles.formSection}>
                   <Text style={styles.label}>Date Watched</Text>
@@ -386,18 +299,63 @@ export default function AddMovieScreen({ navigation }: any) {
                       <Text style={styles.buttonText}>Save Movie</Text>
                     )}
                   </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.cancelButton}
-                    onPress={() => {
-                      setMovieData(null);
-                      setImdbUrl("");
-                      setMovieTitle("");
-                    }}
-                  >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
-                  </TouchableOpacity>
                 </View>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Search Movies</Text>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Search for movies (e.g., The Shawshank Redemption)"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCapitalize="words"
+                editable={!loading}
+              />
+              <TouchableOpacity
+                style={[styles.searchButton, loading && styles.buttonDisabled]}
+                onPress={handleSearchMovies}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Search</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {searchResults.length > 0 && (
+              <View style={styles.resultsSection}>
+                <Text style={styles.sectionTitle}>
+                  Search Results ({searchResults.length})
+                </Text>
+                <View style={styles.moviesList}>
+                  {searchResults.map(renderMovieItem)}
+                </View>
+              </View>
+            )}
+
+            {!loading && searchResults.length === 0 && hasSearched && (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>
+                  No movies found. Try a different search term.
+                </Text>
               </View>
             )}
           </View>
@@ -410,23 +368,23 @@ export default function AddMovieScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fa",
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fa",
   },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
-    paddingTop: 10, // Reduced top padding since SafeAreaView handles status bar
+    paddingTop: 10,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginTop: 10, // Additional top margin for better spacing
+    marginTop: 10,
     marginBottom: 24,
     color: "#1a1a1a",
   },
@@ -434,19 +392,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   input: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#e1e5e9",
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
   },
-  fetchButton: {
+  searchButton: {
     backgroundColor: "#007AFF",
     borderRadius: 12,
     padding: 16,
@@ -459,16 +417,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 16,
   },
-  cancelButton: {
-    borderWidth: 2,
-    borderColor: "#FF3B30",
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 12,
+  backButton: {
+    marginBottom: 16,
   },
-  cancelButtonText: {
-    color: "#FF3B30",
+  backButtonText: {
+    color: "#007AFF",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -480,38 +433,122 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  movieInfo: {
-    alignItems: "center",
+  resultsSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+    marginBottom: 16,
+  },
+  moviesList: {
+    gap: 12,
+  },
+  movieItem: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#e1e5e9",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
   },
   poster: {
+    width: 70,
+    height: 100,
+    borderRadius: 8,
+    backgroundColor: "#eee",
+  },
+  posterLarge: {
     width: 200,
     height: 300,
     borderRadius: 12,
     marginBottom: 16,
   },
+  posterPlaceholder: {
+    width: 70,
+    height: 100,
+    borderRadius: 8,
+    backgroundColor: "#eee",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  posterPlaceholderText: {
+    fontSize: 10,
+    color: "#888",
+  },
+  movieInfo: {
+    flex: 1,
+  },
+  selectedMovieInfo: {
+    alignItems: "center",
+  },
   movieTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 4,
+  },
+  movieTitleLarge: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 8,
     color: "#1a1a1a",
   },
+  movieYear: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+  },
+  movieGenre: {
+    fontSize: 14,
+    color: "#007AFF",
+    marginBottom: 8,
+  },
+  movieDirector: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 8,
+  },
+  movieDirectorLarge: {
+    fontSize: 16,
+    color: "#444",
+    marginBottom: 12,
+  },
   movieMeta: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
   },
-  movieDirector: {
-    fontSize: 16,
-    color: "#444",
-    marginBottom: 12,
-  },
   moviePlot: {
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+  },
+  moviePlotLarge: {
     fontSize: 14,
     color: "#666",
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  ratingLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginRight: 8,
+  },
+  ratingValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1a1a1a",
   },
   formSection: {
     width: "100%",
@@ -523,12 +560,12 @@ const styles = StyleSheet.create({
     color: "#1a1a1a",
   },
   dateButton: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#e1e5e9",
   },
   dateText: {
     fontSize: 16,
@@ -561,37 +598,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#1a1a1a",
   },
-  searchModeContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    padding: 4,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+  emptyState: {
     alignItems: "center",
+    paddingVertical: 40,
   },
-  modeButtonActive: {
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  modeButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+  emptyStateText: {
+    fontSize: 16,
     color: "#666",
-  },
-  modeButtonTextActive: {
-    color: "#007AFF",
+    textAlign: "center",
   },
 });
