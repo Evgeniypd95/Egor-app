@@ -16,6 +16,7 @@ export interface User {
 export interface Movie {
   id: string;
   userId: string;
+  userDisplayName: string | undefined;
   imdbId: string;
   imdbUrl: string;
   title: string;
