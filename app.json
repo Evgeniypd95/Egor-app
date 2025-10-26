@@ -1,27 +1,36 @@
 {
   "expo": {
-    "name": "Movie Tracker",
+    "name": "FilmVault",
     "slug": "movie-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+
     "splash": {
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#007AFF"
     },
+
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.movietracker.app"
+      "bundleIdentifier": "com.evgenypavlov.movietracker"
     },
+
     "android": {
-      "package": "com.movietracker.app",
+      "package": "com.evgenypavlov.movietracker",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#007AFF"
       }
     },
+
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/icon.png"
     },
+
     "plugins": [
       "expo-asset",
       "expo-font"

@@ -29,6 +29,7 @@ export interface Movie {
   runtime: string;
   imdbRating: number;
   userRating: number;
+  rottenTomatoesRating?: string; // Percentage value like "89%"
   watchedDate: Timestamp;
   notes?: string;
   isPublic: boolean;
